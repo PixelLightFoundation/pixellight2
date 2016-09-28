@@ -1,1 +1,1 @@
-# pixellight2
+Just a place to try out new ideas
