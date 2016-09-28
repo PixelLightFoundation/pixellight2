@@ -8,10 +8,12 @@
 ##################################################
 cmake_minimum_required(VERSION 2.8.3)
 
-# Suppress warning about the deprecated target property LOCATION
-cmake_policy(SET CMP0026 OLD)
-# Use old behavior when dealing with variable expansion
-cmake_policy(SET CMP0054 OLD)
+if(CMAKE_MAJOR_VERSION GREATER 2)
+	# Suppress warning about the deprecated target property LOCATION
+	cmake_policy(SET CMP0026 OLD)
+	# Use old behavior when dealing with variable expansion
+	cmake_policy(SET CMP0054 OLD)
+endif()
 
 ##################################################
 ## Project
