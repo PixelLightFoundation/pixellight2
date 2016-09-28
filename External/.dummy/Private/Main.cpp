@@ -4,15 +4,15 @@
 #ifdef WIN32
 
 	#ifdef UNICODE
-	int wmain(int argc, wchar_t **argv)
+	int wmain(int, wchar_t**)
 	#else
-	int main(int argc, char **argv)
+	int main(int, char**)
 	#endif
 	{
 		return 0;
 	}
 #elif LINUX
-	int main(int argc, char **argv)
+	int main(int, char**)
 	{
 		return 0;
 	}

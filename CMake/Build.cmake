@@ -1,8 +1,3 @@
-##################################################
-## This file is part of the PixelLight project
-##################################################
-
-
 # Build type
 if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type (Debug/Release)")
@@ -19,3 +14,9 @@ endif()
 
 # Find diff and patch
 #find_package(Diff)
+
+# Enable IDE folder support
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+# Config file location
+set(PL_CONFIG_FILE_LOCATION "${CMAKE_BINARY_DIR}" CACHE INTERNAL "Location of the PixelLight.h file")

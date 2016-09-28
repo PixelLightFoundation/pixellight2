@@ -10,7 +10,8 @@ pl_set_current_package(External)
 include(ExternalProject)
 
 # Include our location dummy
-pl_add_subdirectory(.dummy)
+#pl_add_subdirectory(.dummy)
+pl_exclude_subdirectory(.dummy)
 
 # These need to go first
 #pl_add_subdirectory(zlib)

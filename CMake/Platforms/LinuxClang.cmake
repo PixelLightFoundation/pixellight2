@@ -1,9 +1,4 @@
 ##################################################
-## This file is part of the PixelLight project
-##################################################
-
-
-##################################################
 ## Linux/Clang platform definitions
 ##
 ## This file contains compiler and linker settings which are specific to the Clang compiler suit under Linux

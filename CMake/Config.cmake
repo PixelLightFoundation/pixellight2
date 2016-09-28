@@ -1,75 +1,23 @@
 ##################################################
-## This file is part of the PixelLight project
-##################################################
-
-
-##################################################
 ## Project configuration
 ##################################################
 
-set(PL_PROJECT_NAME "PixelLight")
+# Include the version info header
+include(${BASE_PATH}/VERSION)
 
-set(PL_PROJECT_VERSION_MAJOR    2)
-set(PL_PROJECT_VERSION_MINOR    0)
-set(PL_PROJECT_VERSION_PATCH    0)
-set(PL_PROJECT_VERSION_RELEASE "Spark")
+# Git info
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${BASE_PATH}/CMake/Modules)
+include(GetGitRevisionDescription)
+get_git_head_revision(PL_PROJECT_GIT_BRANCH PL_PROJECT_GIT_SHA)
 
-# Create PixelLight header file
-configure_file("CMake/Config/PixelLight.h.in" "${CMAKE_BINARY_DIR}/PixelLight.h")
-set(PL_CONFIG_FILE_LOCATION "${CMAKE_BINARY_DIR}" CACHE INTERNAL "Location of the PixelLight.h file")
+# Fix the branch name (we assume gitflow usage)
+string(SUBSTRING "${PL_PROJECT_GIT_BRANCH}" 11 -1 PL_PROJECT_GIT_BRANCH) # 11: strlen /refs/heads/
 
+# Timestamp
+string(TIMESTAMP PL_BUILD_TIME "%Y-%m-%d %H:%M UTC" UTC)
 
-##################################################
-## Developer build
-##################################################
+# Generate the 'rev' version from the git SHA
+string(SUBSTRING "${PL_PROJECT_GIT_SHA}" 0 7 PL_PROJECT_VERSION_REV) # 7 characters from the SHA is git's default abbreviated commit desc
 
-# [TODO]: Do we need the developer build?
-#set(PL_DEVELOPER_BUILD ON CACHE BOOL "Build a version suitable for developing PixelLight itself")
-
-#if(${PL_DEVELOPER_BUILD})
-	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PL_DEV_LIB_DIR})
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PL_DEV_LIB_DIR})
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PL_DEV_BIN_DIR})
-#	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${PL_DEV_LIB_DIR})
-#	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${PL_DEV_LIB_DIR})
-#	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PL_DEV_BIN_DIR})
-#	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${PL_DEV_LIB_DIR})
-#	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${PL_DEV_LIB_DIR})
-#	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PL_DEV_BIN_DIR})
-#else()
-#	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
-#	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY)
-#	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-#	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG)
-#	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG)
-#	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG)
-#	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE)
-#	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE)
-#	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE)
-#endif()
-
-
-##################################################
-## Build configuration
-##################################################
-
-# Enable IDE folder support
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-set(PL_BUILD_SAMPLES OFF CACHE BOOL "Build sample projects?")
-set(PL_BUILD_PLUGINS OFF CACHE BOOL "Build PixelLight plugins")
-set(PL_BUILD_DOCS OFF CACHE BOOL "Build development documentation?")
-set(PL_BUILD_SDK OFF CACHE BOOL "Build SDK installer?")
-set(PL_BUILD_TESTS OFF CACHE BOOL "Build automated unit tests?")
-
-# Build without zip support
-#set(PL_NO_ZIP_SUPPORT OFF CACHE BOOL "Disable zip filesysytem support (not recommended)")
-
-# Build without jpeg support
-#set(PL_NO_JPG_SUPPORT OFF CACHE BOOL "Disable JPEG image loading support")
-
-# Build without png support
-#set(PL_NO_PNG_SUPPORT OFF CACHE BOOL "Disable PNG image loading support")
-
-# Add our tools to CMake module path
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMake/Modules)
+# Create PixelLight build info file
+configure_file("${BASE_PATH}/CMake/Config/BuildInfo.json.in" "${BIN_PATH}/BuildInfo.json")

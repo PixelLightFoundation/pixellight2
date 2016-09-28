@@ -1,0 +1,14 @@
+{
+	"name": 			"${PL_PROJECT_NAME}",
+	
+	"version_major":	${PL_PROJECT_VERSION_MAJOR},
+	"version_minor": 	${PL_PROJECT_VERSION_MINOR},
+	"version_patch": 	${PL_PROJECT_VERSION_PATCH},
+	"version_rev": 		"${PL_PROJECT_VERSION_REV}",
+	"version_name": 	"${PL_PROJECT_VERSION_RELEASE}",
+	
+	"git_sha": 			"${PL_PROJECT_GIT_SHA}",
+	"git_branch":		"${PL_PROJECT_GIT_BRANCH}",
+	
+	"timestamp": 		"${PL_BUILD_TIME}"
+}

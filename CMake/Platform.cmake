@@ -1,9 +1,4 @@
 ##################################################
-## This file is part of the PixelLight project
-##################################################
-
-
-##################################################
 ## Architecture
 ##################################################
 
@@ -42,7 +37,7 @@ else()
 	set(PL_TARGET_BITSIZE "32" CACHE ADVANCED "Target bitsize")
 
 	# Target architecture & bitsize (x86, x64 - yes, there are many names for the 64 bit version, but e.g. "x64" is just more handy as the technically "x86_32")
-	set(PL_TARGET_ARCHBITSIZE ${CMAKETOOLS_TARGET_ARCH} CACHE ADVANCED "Target architecture & bitsize")
+	set(PL_TARGET_ARCHBITSIZE ${PL_TARGET_ARCH} CACHE ADVANCED "Target architecture & bitsize")
 endif()
 
 
@@ -66,27 +61,33 @@ if(UNIX)
 endif()
 
 if(WIN32)
+	pl_debug_message("Detected Windows platform")
 	include(CMake/Platforms/WinMSVC.cmake)
 elseif(LINUX)
 
 	# Common settings
+	pl_debug_message("Detected *NIX platform")
 	include(CMake/Platforms/LinuxCommon.cmake)
 
 	# Android NDK ("CMAKE_CXX_COMPILER_ID" matches also "GNU", so this test must come first)
-	if(ANDROID)
-		include(CMake/Platforms/LinuxNDK.cmake)
+	#if(ANDROID)
+	#	include(CMake/Platforms/LinuxNDK.cmake)
 
 	# NaCL ("CMAKE_CXX_COMPILER_ID" matches also "GNU", so this test must come first)
-	elseif(NACL)
-		include(CMake/Platforms/LinuxNaCL.cmake)
+	#elseif(NACL)
+	#	include(CMake/Platforms/LinuxNaCL.cmake)
 
 	# GCC
-	elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
+	if("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
+		pl_debug_message("	- GCC based")
 		include(CMake/Platforms/LinuxGCC.cmake)
+	#endif()
 
 	# Clang
 	elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+		pl_debug_message("	- Clang based")
 		include(CMake/Platforms/LinuxClang.cmake)
+	#endif()
 
 	# ?
 	else()

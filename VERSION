@@ -1,0 +1,12 @@
+# This file defines the current version of PixelLight for build system purposes
+
+#
+# Current version is 2.0.0 (develop)
+#
+
+# CMake variables used during the build
+set(PL_PROJECT_NAME "PixelLight")
+set(PL_PROJECT_VERSION_MAJOR    2)
+set(PL_PROJECT_VERSION_MINOR    0)
+set(PL_PROJECT_VERSION_PATCH    0)
+set(PL_PROJECT_VERSION_RELEASE "develop")

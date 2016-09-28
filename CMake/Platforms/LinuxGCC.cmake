@@ -1,9 +1,4 @@
 ##################################################
-## This file is part of the PixelLight project
-##################################################
-
-
-##################################################
 ## Linux/GCC platform definitions
 ##
 ## This file contains compiler and linker settings which are specific to the GCC compiler suit under Linux

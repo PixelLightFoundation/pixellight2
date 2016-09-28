@@ -1,8 +1,3 @@
-##################################################
-## This file is part of the PixelLight project
-##################################################
-
-
 # We want to use the rc.exe resource compiler on Windows under MSVC
 set(PL_RC_COMPILER "RC")
 
@@ -64,7 +59,6 @@ set(WIN32_COMPILE_DEFS
 )
 
 if((NOT PL_TARGET_BITSIZE MATCHES 32) AND (CMAKE_SIZEOF_VOID_P MATCHES 8))
-	message(STATUS "Setting x64 build preprocessor definitions")
 	set(WIN32_COMPILE_DEFS
 		${WIN32_COMPILE_DEFS}
 		WIN64							# We are building for a 64Bit architecture
@@ -76,7 +70,7 @@ endif()
 ##################################################
 ## Compiler flags
 ##################################################
-set(CMAKE_CXX_FLAGS "/nologo /Zc:wchar_t /Zc:forScope /GR- /Zi /MP /fp:precise /EHs-c- /Gm- /Gy- /fp:fast /fp:except- /Gd")
+set(CMAKE_CXX_FLAGS "/nologo /Zc:wchar_t /Zc:forScope /GR /Zi /MP /fp:precise /EHsc /Gm- /Gy- /fp:fast /fp:except- /Gd")
 
 # Debug
 set(CMAKE_CXX_FLAGS_DEBUG "/W4 /MDd /Od /Ob0 /RTC1")

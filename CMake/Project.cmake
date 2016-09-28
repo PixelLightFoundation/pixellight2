@@ -1,8 +1,3 @@
-##################################################
-## This file is part of the PixelLight project
-##################################################
-
-
 # This variable will collect all the doxygen-enabled projects
 set(PL_DOXYGEN_PATHS CACHE INTERNAL "")
 
@@ -24,6 +19,19 @@ set(PL_DOXYGEN_PATHS CACHE INTERNAL "")
 macro(pl_add_subdirectory dir)
 	add_subdirectory(${dir})
 
+	set(PL_MANUAL_SUBDIRS ${PL_MANUAL_SUBDIRS} ${dir})
+endmacro()
+
+##################################################
+## MACRO: pl_exclude_subdirectory
+##
+## Helper macro to exclude specific projects from the build while still keeping the
+## ability to use pl_add_subdir_projects to automatically collect the rest
+##
+##   dir Subdir name
+##
+##################################################
+macro(pl_exclude_subdirectory dir)
 	set(PL_MANUAL_SUBDIRS ${PL_MANUAL_SUBDIRS} ${dir})
 endmacro()
 
@@ -71,7 +79,6 @@ macro(pl_add_subdir_projects)
 
 	# Now add them as usual
 	foreach(dir ${dir_list})
-		message(STATUS "\n-- Adding directory ${dir}")
 		add_subdirectory(${dir})
 	endforeach()
 endmacro()
@@ -87,6 +94,9 @@ endmacro()
 macro(pl_set_current_package name)
 	set(PL_CURRENT_PACKAGE ${name})
 	set(PL_CURRENT_PACKAGE_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+	
+	pl_newline()
+	pl_message("- Package ${name}")
 endmacro()
 
 ##################################################
@@ -166,6 +176,12 @@ macro(pl_project name)
 	# Define local project variables
 	set(PL_CURRENT_TARGET_NAME ${name})
 	set(PL_CURRENT_OUTPUT_NAME "${PL_CURRENT_PACKAGE}.${name}")
+	
+	if(NOT "${PROJECT_NAME}" STREQUAL "")
+		set(PL_CURRENT_OUTPUT_NAME "${PROJECT_NAME}.${PL_CURRENT_OUTPUT_NAME}")
+	endif()
+	
+	pl_message("  - ${PL_CURRENT_OUTPUT_NAME}")
 
 	# The path in IDE
 	string(REPLACE "${PL_CURRENT_PACKAGE_ROOT}" "" PL_CURRENT_IDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -390,6 +406,9 @@ macro(pl_build_library type)
 		set(lib_type "SHARED")
 	endif()
 	
+	# [TODO] Re-enable PLPlugin once it can cope with the new reflection system
+	set(is_plugin OFF)
+	
 	# Parse options
 	set(no_install OFF)
 	set(no_docs OFF)
@@ -427,11 +446,14 @@ macro(pl_build_library type)
 	if(NOT "${PL_CURRENT_DEPENDENCIES}" STREQUAL "")
 		add_dependencies(${PL_CURRENT_TARGET_NAME} ${PL_CURRENT_DEPENDENCIES})
 	endif()
+	
+	# Special dependency for the config target
+	add_dependencies(${PL_CURRENT_TARGET_NAME} CONFIGURE)
 
 	# Preprocessor definitions
-	set_target_properties(
-		${PL_CURRENT_TARGET_NAME}
-		PROPERTIES COMPILE_DEFINITIONS "${PL_CURRENT_COMPILE_DEFS}")
+	set_property(
+		TARGET ${PL_CURRENT_TARGET_NAME}
+		PROPERTY COMPILE_DEFINITIONS "${PL_CURRENT_COMPILE_DEFS}" $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDbgInfo>>:DEBUG _DEBUG> $<$<OR:$<CONFIG:Release>,$<CONFIG:MinSizeRel>>:NDEBUG>)
 
 	# Solution folders
 	set_property(
@@ -543,6 +565,9 @@ macro(pl_build_executable subsystem)
 	if(NOT "${PL_CURRENT_DEPENDENCIES}" STREQUAL "")
 		add_dependencies(${PL_CURRENT_TARGET_NAME} ${PL_CURRENT_DEPENDENCIES})
 	endif()
+	
+	# Special dependency for the config target
+	add_dependencies(${PL_CURRENT_TARGET_NAME} CONFIGURE)
 
 	# Preprocessor definitions
 	set_target_properties(
@@ -571,6 +596,35 @@ macro(pl_build_executable subsystem)
 endmacro()
 
 ##################################################
+## MACRO: pl_build_test
+##
+## Build a test executable
+##
+##################################################
+macro(pl_build_test)
+
+	# Shared dependency
+	pl_add_dependency(UnitTest++)
+	
+	# Test is just an executable
+	if(ANDROID)
+		pl_build_library(SHARED)
+	else()
+		pl_build_executable(CONSOLE)
+	endif()
+
+	# With a custom post-build step
+	add_custom_command(
+		TARGET ${PL_CURRENT_TARGET_NAME}
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E echo Running unit test ${PL_CURRENT_TARGET_NAME}...
+		COMMAND ${PL_CURRENT_TARGET_NAME}
+		WORKING_DIRECTORY ${PL_PLATFORM_OUT_DIR}
+	)
+		
+endmacro()
+
+##################################################
 ## MACRO: pl_build_external
 ##
 ## Helper to finalize the build of an external dependency project
@@ -586,6 +640,26 @@ macro(pl_build_external)
 	# Dependencies
 	if(NOT "${PL_CURRENT_DEPENDENCIES}" STREQUAL "")
 		add_dependencies(${PL_CURRENT_TARGET_NAME} ${PL_CURRENT_DEPENDENCIES})
+	endif()
+	
+	# Special dependency for the config target
+	add_dependencies(${PL_CURRENT_TARGET_NAME} CONFIGURE)
+
+endmacro()
+
+##################################################
+## MACRO: pl_external_archive
+##
+## Configure the input URL to point to a local cached archive if that is an option 
+##
+##################################################
+macro(pl_external_archive arch url_var)
+
+	if(NOT "${PL_EXTERNAL_ARCHIVE_CACHE}" STREQUAL "" AND EXISTS "${PL_EXTERNAL_ARCHIVE_CACHE}/${arch}")
+		set(${url_var} "${PL_EXTERNAL_ARCHIVE_CACHE}/${arch}")
+		message(STATUS "- External dependency ${PL_CURRENT_TARGET_NAME} will be built from local cache (${${url_var}})")
+	else()
+		message(STATUS "- External dependency ${PL_CURRENT_TARGET_NAME} will be downloaded from ${${url_var}}")
 	endif()
 
 endmacro()

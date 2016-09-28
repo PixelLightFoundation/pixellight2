@@ -1,9 +1,4 @@
 ##################################################
-## This file is part of the PixelLight project
-##################################################
-
-
-##################################################
 ## Linux/Common platform definitions
 ##
 ## This file contains variables and macros that can be used when you build
@@ -29,7 +24,6 @@ set(LINUX_COMPILE_DEFS
 )
 
 if((NOT CMAKETOOLS_TARGET_BITSIZE MATCHES 32) AND (CMAKE_SIZEOF_VOID_P MATCHES 8))
-	message(STATUS "Setting x64 build preprocessor definitions")
 	set(LINUX_COMPILE_DEFS
 		${LINUX_COMPILE_DEFS}
 		X64_ARCHITECTURE									# We are building for a 64Bit architecture
