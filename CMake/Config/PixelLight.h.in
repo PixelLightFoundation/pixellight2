@@ -1,0 +1,16 @@
+// This file is part of the PixelLight project
+// See LICENSE for copyright details
+
+
+#pragma once
+
+// PixelLight project
+#define PIXELLIGHT_NAME				"${PL_PROJECT_NAME}"
+#define PIXELLIGHT_SUFFIX			"${PL_CONFIG_SUFFIX}"	// [NOTE] This is never set in v2.0
+															// [TODO] Remove this and all references to it
+
+// PixelLight version
+#define PIXELLIGHT_VERSION_MAJOR	${PL_PROJECT_VERSION_MAJOR}
+#define PIXELLIGHT_VERSION_MINOR	${PL_PROJECT_VERSION_MINOR}
+#define PIXELLIGHT_VERSION_PATCH	${PL_PROJECT_VERSION_PATCH}
+#define PIXELLIGHT_VERSION_RELEASE "${PL_PROJECT_VERSION_RELEASE}"
