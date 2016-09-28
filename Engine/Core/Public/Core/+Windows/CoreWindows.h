@@ -59,6 +59,10 @@ PL_WARNING_DISABLE(4251) // "'identifier' : class X needs to have dll-interface 
 // Initiates a debug break
 #define PL_DBG_BREAK __debugbreak()
 
+// Force function inlining
+// Note: use 'inline' where you just want to provide a hint to the compiler
+#define PL_INLINE __forceinline
+
 
 namespace PixelLight
 {

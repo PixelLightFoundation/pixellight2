@@ -63,6 +63,16 @@
 */
 #define PL_TODO(author, msg)
 
+// Specifies an empty operation
+#define PL_NOP
+
+// Initiates a debug break
+#define PL_DBG_BREAK abort() // [TODO]
+
+// Force function inlining
+// Note: use 'inline' where you just want to provide a hint to the compiler
+#define PL_INLINE __attribute__((always_inline))
+
 
 //[-------------------------------------------------------]
 //[ Includes                                              ]

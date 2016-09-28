@@ -9,35 +9,52 @@
 //#include <Core/Runtime/Application.h>
 
 
-//using namespace PixelLight;
+#include <Core/Functional/Function.h>
+#include <Core/Functional/Immutable.h>
+using namespace PixelLight;
 
+void func(int)
+{
+}
+
+class A
+{
+public:
+	void F(int) {}
+};
 
 int PLMain()
 {
+	Function<void(int)> f(func);
+	Function<void(int)> g([](int) {});
+
+	auto l = [](int) {};
+	Function<void(int)> h(l);
+
+	f(0);
+	//g(1);
+	//h(2);
+
+	for (int i = 0; i < 10000000; ++i)
+	{
+		f(i);
+	}
+
+	for (int i = 0; i < 10000000; ++i)
+	{
+		func(i);
+	}
+
+	//A a;
+	//Function<void(int)> i(&A::F);
+	//i(3);
+
+	bind(int) a(1);
+	int ma = a;
+	//a = 2; // <-- WON'T compile
+
+	const int& mar = a;
+	//int& mart = a; // <-- WON'T compile
+
 	return 0;
 }
-
-// Application class for the sample
-//class SampleApp : public Application
-//{
-//PL_PROTECTED_OVERRIDES:
-//	virtual bool OnInitialize() override
-//	{
-//		// ...
-//		struct Test
-//		{
-//			int a;
-//		};
-//
-//		SharedPtr<Test> ptr1;
-//
-//		SharedPtr<Test, SharedPtrIsRef> ptr2(new Test());
-//
-//
-//		// Just exit right away
-//		return false;
-//	}
-//};
-//
-//// Declare the entry point
-//PL_IMPLEMENT_APP(SampleApp);
