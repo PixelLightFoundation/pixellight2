@@ -12,7 +12,7 @@ namespace PixelLight
 		template <class F, int S = sizeof(F)>
 		void Reset(F func)
 		{
-			Storage<F, IsFunctionPtr<F>::Value>::Store(func, &m_TempStorage);
+			Storage<F, IsFunctionPtr<F>::Value>::Store(func, &_storage);
 		}
 
 		/*template <class F, int S = sizeof(F)>
@@ -23,24 +23,24 @@ namespace PixelLight
 
 		R operator()(Args... args)
 		{
-			if (m_TempStorage & ~0x01)
+			if (_storage & 0x01)
 			{
 				typedef R(*fn)(Args...);
-				fn f = (fn)(m_TempStorage & ~0x01);
+				fn f = (fn)(_storage & ~0x01);
 				f(args...);
 			}
 			else
 			{
-				FuncImplBase* f = (FuncImplBase*)m_TempStorage;
+				FuncImplBase* f = (FuncImplBase*)_storage;
 				f->DoCall(args...);
 			}
 		}
 		
 		~FunctionBase()
 		{
-			if (!(m_TempStorage & ~0x01))
+			if (!(_storage & 0x01))
 			{
-				FuncImplBase* f = (FuncImplBase*)m_TempStorage;
+				FuncImplBase* f = (FuncImplBase*)_storage;
 				delete f;
 			}
 		}
@@ -89,7 +89,7 @@ namespace PixelLight
 			}
 		};
 
-		intptr_t m_TempStorage;
+		intptr_t _storage;
 	};
 
 	template <class T>

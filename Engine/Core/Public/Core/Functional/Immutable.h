@@ -32,4 +32,4 @@ namespace PixelLight
 	};
 }
 
-#define bind(T) PixelLight::Immutable<T>
+#define fix(T) PixelLight::Immutable<T>

@@ -11,10 +11,16 @@
 
 #include <Core/Functional/Function.h>
 #include <Core/Functional/Immutable.h>
+#include <Core/Utils/Stopwatch.h>
 using namespace PixelLight;
 
-void func(int)
+#include <functional>
+
+static int64 counter = 0;
+
+void func(int i)
 {
+	counter += i;
 }
 
 class A
@@ -26,34 +32,91 @@ public:
 int PLMain()
 {
 	Function<void(int)> f(func);
-	Function<void(int)> g([](int) {});
+	Function<void(int)> g([&](int i) { counter += i; });
 
-	auto l = [](int) {};
+	auto l = [&](int i) { counter += i; };
 	Function<void(int)> h(l);
 
 	f(0);
-	//g(1);
-	//h(2);
-
-	for (int i = 0; i < 10000000; ++i)
+	g(1);
+	h(2);
+	
+	ElapsedTime rawCall;
 	{
-		f(i);
+		Stopwatch::Scope timer(rawCall);
+		for (int i = 0; i < 10000000; ++i)
+		{
+			func(i);
+		}
 	}
 
-	for (int i = 0; i < 10000000; ++i)
+	void(*pfn)(int) = func;
+	ElapsedTime pfnCall;
 	{
-		func(i);
+		Stopwatch::Scope timer(pfnCall);
+		for (int i = 0; i < 10000000; ++i)
+		{
+			pfn(i);
+		}
 	}
+
+	ElapsedTime funCall;
+	{
+		Stopwatch::Scope timer(funCall);
+		for (int i = 0; i < 10000000; ++i)
+		{
+			f(i);
+		}
+	}	
+
+	std::function<void(int)> stdf(func);
+	ElapsedTime stdCall;
+	{
+		Stopwatch::Scope timer(stdCall);
+		for (int i = 0; i < 10000000; ++i)
+		{
+			stdf(i);
+		}
+	}
+
+	ElapsedTime lamCall;
+	{
+		Stopwatch::Scope timer(lamCall);
+		for (int i = 0; i < 10000000; ++i)
+		{
+			h(i);
+		}
+	}
+
+	std::function<void(int)> stdlam(l);
+	ElapsedTime stdlamCall;
+	{
+		Stopwatch::Scope timer(stdlamCall);
+		for (int i = 0; i < 10000000; ++i)
+		{
+			stdlam(i);
+		}
+	}
+
+	printf("Raw call: %I64d\n", rawCall.GetTime());
+	printf("Function pointer call: %I64d\n", pfnCall.GetTime());
+	printf("PL Function call: %I64d\n", funCall.GetTime());
+	printf("std::function call: %I64d\n", stdCall.GetTime());
+	printf("PL Function lambda call: %I64d\n", lamCall.GetTime());
+	printf("std::function lambda call: %I64d\n", stdlamCall.GetTime());
+
+	int dummy = 0;
+	scanf("%d", &dummy);
 
 	//A a;
 	//Function<void(int)> i(&A::F);
 	//i(3);
 
-	bind(int) a(1);
-	int ma = a;
+	//fix(int) a(1);
+	//int ma = a;
 	//a = 2; // <-- WON'T compile
 
-	const int& mar = a;
+	//const int& mar = a;
 	//int& mart = a; // <-- WON'T compile
 
 	return 0;

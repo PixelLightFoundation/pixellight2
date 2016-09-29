@@ -25,10 +25,20 @@
  */
 #define require_msg(x, m, ...) if (!(x)) { PL_DBG_BREAK; PixelLight::Internal::__Assert(m, __VA_ARGS__); }
 
+/**
+ *	Debug utility used to validate result of an operation.
+ *	Will cause the debugger to break if it is attached
+ *
+ *	@param x The expression to check
+ */
+#define check(x) if (!(x)) { PL_DBG_BREAK; }
+
+
 #else
 
 #define require(x) PL_NOP
 #define require_msg(x, m, ...) PL_NOP
+#define check(x) x
 
 #endif
 

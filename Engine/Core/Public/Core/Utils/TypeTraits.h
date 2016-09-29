@@ -108,7 +108,7 @@ namespace PixelLight
 	template <class T, T Val>
 	struct StaticConst
 	{
-		static T Value = Val;
+		static const T Value = Val;
 
 		typedef T ValueType;
 		typedef StaticConst Type;
@@ -257,7 +257,7 @@ namespace PixelLight
 			IsArray<U>::Value,
 			typename RemoveExtent<U>::Type,
 			typename StaticIf<
-				sFunction<U>::Value,
+				IsFunction<U>::Value,
 				typename AddPointer<U>::Type,
 				typename RemoveCV<U>::Type
 			>::Type
