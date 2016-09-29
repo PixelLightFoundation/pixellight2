@@ -26,9 +26,6 @@ namespace PixelLight
 		typedef T Type;
 	};
 
-	template <class T>
-	using RemoveRefT = typename RemoveRef<T>::Type;
-
 	/**
 	 *	De-const a type
 	 */
@@ -43,9 +40,6 @@ namespace PixelLight
 	{
 		typedef T Type;
 	};
-
-	template <class T>
-	using RemoveConstT = typename RemoveConst<T>::Type;
 
 	/**
 	*	De-volatile a type
@@ -62,20 +56,14 @@ namespace PixelLight
 		typedef T Type;
 	};
 
-	template <class T>
-	using RemoveVolatileT = typename RemoveVolatile<T>::Type;
-
 	/**
 	 *	Combination of RemoveConst and RemoveVolatile
 	 */
 	template <class T>
 	struct RemoveCV
 	{
-		typedef RemoveVolatileT<RemoveConstT<T>> Type;
+		typedef typename RemoveVolatile<typename RemoveConst<T>::Type>::Type Type;
 	};
-
-	template <class T>
-	using RemoveCVT = typename RemoveCV<T>::Type;
 
 	/**
 	 *	Get base type of an array
@@ -99,9 +87,6 @@ namespace PixelLight
 		typedef T Type;
 	};
 
-	template <class T>
-	using RemoveExtentT = typename RemoveExtent<T>::Type;
-
 	/**
 	 *	Compile type conditional
 	 */
@@ -117,16 +102,13 @@ namespace PixelLight
 		typedef FalseT Type;
 	};
 
-	template <bool B, class TrueT, class FalseT>
-	using StaticIfT = typename StaticIf<B, TrueT, FalseT>::Type;
-
 	/**
 	 *	Compile-time constant
 	 */
 	template <class T, T Val>
 	struct StaticConst
 	{
-		static constexpr T Value = Val;
+		static T Value = Val;
 
 		typedef T ValueType;
 		typedef StaticConst Type;
@@ -147,9 +129,6 @@ namespace PixelLight
 	PL_TODO(AM, "Should use size_t equivalent");
 	template <class T, int N>
 	struct IsArray<T[N]> : StaticTrue {};
-
-	template <class T>
-	constexpr bool IsArrayV = IsArray<T>::Value;
 
 	/**
 	 *	Check if given type is a function
@@ -213,9 +192,6 @@ namespace PixelLight
 	template<class Ret, class... Args>
 	struct IsFunction<Ret(Args..., ...)const volatile &&> : StaticTrue {};
 
-	template <class T>
-	constexpr bool IsFunctionV = IsFunction<T>::Value;
-
 	/**
 	 *	Check if given type is a function pointer
 	 */
@@ -230,9 +206,6 @@ namespace PixelLight
 	template<class Ret, class... Args>
 	struct IsFunctionPtr<Ret(*)(Args..., ...)> : StaticTrue {};
 
-	template <class T>
-	constexpr bool IsFunctionPtrV = IsFunction<T>::Value;
-
 	/**
 	 *	Attach a pointer to type
 	 */
@@ -241,30 +214,30 @@ namespace PixelLight
 		template <class T, bool IsFunction = false>
 		struct AddPointer
 		{
-			using Type = RemoveRefT<T>*;
+			typedef typename RemoveRef<T>::Type* Type;
 		};
 
 		template <class T>
 		struct AddPointer<T, true>
 		{
-			using Type = T;
+			typedef T Type;
 		};
 
 		template <class T, class... Args>
 		struct AddPointer<T(Args...), true>
 		{
-			using Type = T(*)(Args...);
+			typedef T(*)(Args...) Type;
 		};
 
 		template <class T, class... Args>
 		struct AddPointer<T(Args..., ...), true>
 		{
-			using Type = T(*)(Args..., ...);
+			typedef T(*)(Args..., ...) Type;
 		};
 	}
 
 	template <class T>
-	struct AddPointer : Internal::AddPointer<T, IsFunctionV<T>> {};
+	struct AddPointer : Internal::AddPointer<T, IsFunction<T>::Value> {};
 
 	template <class T>
 	using AddPointerT = typename AddPointer<T>::Type;
@@ -277,16 +250,17 @@ namespace PixelLight
 	struct Decay
 	{
 	private:
-		typedef RemoveRefT<T> U;
+		typedef typename RemoveRef<T>::Type U;
 
 	public:
-		typedef StaticIfT<
-			IsArrayV<U>,
-			RemoveExtentT<U>,
-			StaticIfT<IsFunctionV<U>, AddPointerT<U>, RemoveCVT<U>>
-		> Type;
+		typedef typename StaticIf<
+			IsArray<U>::Value,
+			typename RemoveExtent<U>::Type,
+			typename StaticIf<I
+				sFunction<U>::Value,
+				typename AddPointer<U>::Type,
+				typename RemoveCV<U>::Type
+			>::Type
+		>::Type Type;
 	};
-
-	template <class T>
-	using DecayT = typename Decay<T>::Type;
 }
