@@ -226,13 +226,13 @@ namespace PixelLight
 		template <class T, class... Args>
 		struct AddPointer<T(Args...), true>
 		{
-			typedef T(*)(Args...) Type;
+			typedef T(*Type)(Args...);
 		};
 
 		template <class T, class... Args>
 		struct AddPointer<T(Args..., ...), true>
 		{
-			typedef T(*)(Args..., ...) Type;
+			typedef T(*Type)(Args..., ...);
 		};
 	}
 
@@ -256,7 +256,7 @@ namespace PixelLight
 		typedef typename StaticIf<
 			IsArray<U>::Value,
 			typename RemoveExtent<U>::Type,
-			typename StaticIf<I
+			typename StaticIf<
 				sFunction<U>::Value,
 				typename AddPointer<U>::Type,
 				typename RemoveCV<U>::Type

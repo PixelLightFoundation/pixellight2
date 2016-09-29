@@ -31,18 +31,51 @@ namespace PixelLight
 			}
 			else
 			{
-				// ...
+				FuncImplBase* f = (FuncImplBase*)m_TempStorage;
+				f->DoCall(args...);
+			}
+		}
+		
+		~FunctionBase()
+		{
+			if (!(m_TempStorage & ~0x01))
+			{
+				FuncImplBase* f = (FuncImplBase*)m_TempStorage;
+				delete f;
 			}
 		}
 
 	private:
+		class FuncImplBase
+		{
+		public:		
+			virtual ~FuncImplBase() {}
+			virtual R DoCall(Args... args) = 0;
+		};
+		
+		template <class T>
+		class FuncImpl : public FuncImplBase
+		{
+		public:
+			FuncImpl(T func) : _callable(func)
+			{}
+			
+			virtual R DoCall(Args... args)
+			{
+				_callable(args...);
+			}
+			
+		private:
+			T _callable;
+		};
+		
 		template <class T, bool IsFunction = false>
 		struct Storage
 		{
 			static void Store(T func, intptr_t* dest)
 			{
 				// Generic storage using a virtual object
-				// ...
+				*dest = (intptr_t)new FuncImpl<T>(func);
 			}
 		};
 
