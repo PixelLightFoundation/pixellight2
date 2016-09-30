@@ -12,6 +12,7 @@
 #include <Core/Functional/Function.h>
 #include <Core/Functional/Immutable.h>
 #include <Core/Utils/Stopwatch.h>
+#include <Core/Utils/Tuple.h>
 using namespace PixelLight;
 
 #include <functional>
@@ -36,6 +37,11 @@ int PLMain()
 
 	auto l = [&](int i) { counter += i; };
 	Function<void(int)> h(l);
+
+	Tuple<int, const int&, float> t;
+	int ii = 4;
+	TupleStore<1>(t, ii);
+	const int& v = TupleGet<1>(t);
 
 	f(0);
 	g(1);
