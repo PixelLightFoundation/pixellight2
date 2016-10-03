@@ -5,107 +5,113 @@
 
 namespace PixelLight
 {
-	template <class R, class... Args>
-	struct FunctionBase
+	namespace Internal
 	{
-	public:
-		template <class F, int S = sizeof(F)>
-		void Reset(F func)
-		{
-			Storage<F, IsFunctionPtr<F>::Value>::Store(func, &_storage);
-		}
-
-		/*template <class F, int S = sizeof(F)>
-		void Reset(F&& func)
-		{
-			Storage<F, IsFunctionV<F>>::Store(std::forward(func));
-		}*/
-
-		R operator()(Args... args)
-		{
-			if (_storage & 0x01)
-			{
-				typedef R(*fn)(Args...);
-				fn f = (fn)(_storage & ~0x01);
-				f(args...);
-			}
-			else
-			{
-				FuncImplBase* f = (FuncImplBase*)_storage;
-				f->DoCall(args...);
-			}
-		}
-		
-		~FunctionBase()
-		{
-			if (!(_storage & 0x01))
-			{
-				FuncImplBase* f = (FuncImplBase*)_storage;
-				delete f;
-			}
-		}
-
-	private:
-		class FuncImplBase
-		{
-		public:		
-			virtual ~FuncImplBase() {}
-			virtual R DoCall(Args... args) = 0;
-		};
-		
-		template <class T>
-		class FuncImpl : public FuncImplBase
+		template <class R, class... Args>
+		struct FunctionBase
 		{
 		public:
-			FuncImpl(T func) : _callable(func)
-			{}
-			
-			virtual R DoCall(Args... args)
+			template <class F, int S = sizeof(F)>
+			void Reset(F func)
 			{
-				_callable(args...);
+				Storage<F, IsFunctionPtr<F>::Value>::Store(func, &_storage);
 			}
-			
+
+			/*template <class F, int S = sizeof(F)>
+			void Reset(F&& func)
+			{
+			Storage<F, IsFunctionV<F>>::Store(std::forward(func));
+			}*/
+
+			R operator()(Args... args)
+			{
+				if (_storage & 0x01)
+				{
+					typedef R(*fn)(Args...);
+					fn f = (fn)(_storage & ~0x01);
+					f(args...);
+				}
+				else
+				{
+					FuncImplBase* f = (FuncImplBase*)_storage;
+					f->DoCall(args...);
+				}
+			}
+
+			~FunctionBase()
+			{
+				if (!(_storage & 0x01))
+				{
+					FuncImplBase* f = (FuncImplBase*)_storage;
+					delete f;
+				}
+			}
+
 		private:
-			T _callable;
-		};
-		
-		template <class T, bool IsFunction = false>
-		struct Storage
-		{
-			static void Store(T func, intptr_t* dest)
+			class FuncImplBase
 			{
-				// Generic storage using a virtual object
-				*dest = (intptr_t)new FuncImpl<T>(func);
-			}
+			public:
+				virtual ~FuncImplBase() {}
+				virtual R DoCall(Args... args) = 0;
+			};
+
+			template <class T>
+			class FuncImpl : public FuncImplBase
+			{
+			public:
+				FuncImpl(T func) : _callable(func)
+				{}
+
+				virtual R DoCall(Args... args)
+				{
+					_callable(args...);
+				}
+
+			private:
+				T _callable;
+			};
+
+			template <class T, bool IsFunction = false>
+			struct Storage
+			{
+				static void Store(T func, intptr_t* dest)
+				{
+					// Generic storage using a virtual object
+					*dest = (intptr_t)new FuncImpl<T>(func);
+				}
+			};
+
+			template <class T>
+			struct Storage<T, true>
+			{
+				static void Store(T func, intptr_t* dest)
+				{
+					// Optimized function pointer storage
+					*dest = (intptr_t)func | 0x01;
+				}
+			};
+
+			intptr_t _storage;
 		};
 
 		template <class T>
-		struct Storage<T, true>
+		struct GetFunctionType;
+
+		template <class R, class... Args>
+		struct GetFunctionType<R(Args...)>
 		{
-			static void Store(T func, intptr_t* dest)
-			{
-				// Optimized function pointer storage
-				*dest = (intptr_t)func | 0x01;
-			}
+			typedef FunctionBase<R, Args...> Type;
 		};
+	}
 
-		intptr_t _storage;
-	};
-
+	/**
+	 *	Function object implementation
+	 */
 	template <class T>
-	struct GetFunctionType;
-
-	template <class R, class... Args>
-	struct GetFunctionType<R(Args...)>
-	{
-		typedef FunctionBase<R, Args...> Type;
-	};
-
-	template <class T>
-	struct Function : public GetFunctionType<T>::Type
+	struct Function : public Internal::GetFunctionType<T>::Type
 	{
 		typedef Function<T> Type;
-		typedef typename GetFunctionType<T>::Type FuncType;
+		typedef typename Internal::GetFunctionType<T>::Type FuncType;
 
 		Function()
 		{

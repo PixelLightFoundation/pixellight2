@@ -82,9 +82,11 @@ namespace PixelLight
 #if WIN64
 	typedef unsigned __int64	intptr;
 	typedef unsigned __int64	handle;
+	typedef unsigned __int64	size;
 #else
 	typedef unsigned __int32	intptr;
 	typedef unsigned __int32	handle;
+	typedef unsigned __int32	size;
 #endif
 
 

@@ -13,6 +13,8 @@
 #include <Core/Functional/Immutable.h>
 #include <Core/Utils/Stopwatch.h>
 #include <Core/Utils/Tuple.h>
+#include <Core/String/CString.h>
+#include <Core/String/DString.h>
 using namespace PixelLight;
 
 #include <functional>
@@ -24,11 +26,22 @@ void func(int i)
 	counter += i;
 }
 
+void func2(int i, float f)
+{
+	counter += i;
+}
+
 class A
 {
 public:
 	void F(int) {}
 };
+
+template <class F, class... T, int... I>
+void Invoke(const F& fn, const Tuple<T...>& tuple, IndexSequence<I...>)
+{
+	fn(TupleGet<I>(tuple)...);
+}
 
 int PLMain()
 {
@@ -37,16 +50,17 @@ int PLMain()
 
 	auto l = [&](int i) { counter += i; };
 	Function<void(int)> h(l);
-
-	Tuple<int, const int&, float> t;
-	int ii = 4;
-	TupleStore<1>(t, ii);
-	const int& v = TupleGet<1>(t);
-
+	
 	f(0);
 	g(1);
 	h(2);
+
+	Tuple<int, float> t;
+	TupleStore<0>(t, 2);
+	TupleStore<1>(t, 4.0f);
+	Invoke(func2, t, MakeIndexSequence<2>());
 	
+#if 0
 	ElapsedTime rawCall;
 	{
 		Stopwatch::Scope timer(rawCall);
@@ -110,6 +124,9 @@ int PLMain()
 	printf("std::function call: %I64d\n", stdCall.GetTime());
 	printf("PL Function lambda call: %I64d\n", lamCall.GetTime());
 	printf("std::function lambda call: %I64d\n", stdlamCall.GetTime());
+#endif
+
+	CString str("aaa");
 
 	int dummy = 0;
 	scanf("%d", &dummy);

@@ -47,16 +47,22 @@ set(WIN32_WS2_32_LIB	ws2_32.lib)		# Winsock2 library
 set(WIN32_OPENGL32_LIB	opengl32.lib)	# OpenGL library
 set(WIN32_GLU32_LIB		glu32.lib)		# GLU library
 
-
 ##################################################
 ## Preprocessor definitions
 ##################################################
 set(WIN32_COMPILE_DEFS
 	WIN32								# Windows system
-	UNICODE								# Use unicode
-	_UNICODE							# Use unicode
 	_CRT_SECURE_NO_DEPRECATE			# Disable CRT deprecation warnings
 )
+
+set(PL_WIN_UNICODE OFF CACHE BOOL "Build Windows verison with Unicode support")
+if(PL_WIN_UNICODE)
+	set(WIN32_COMPILE_DEFS
+		${WIN32_COMPILE_DEFS}
+		UNICODE
+		_UNICODE
+	)
+endif()
 
 if((NOT PL_TARGET_BITSIZE MATCHES 32) AND (CMAKE_SIZEOF_VOID_P MATCHES 8))
 	set(WIN32_COMPILE_DEFS

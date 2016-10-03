@@ -25,4 +25,6 @@
 #include "CoreMacros.h"
 #include "System/Exception.h"
 #include "System/Assert.h"
+#include "System/Memory.h"
+#include "String/String.h"
 //#include "Log/Trace.h"
