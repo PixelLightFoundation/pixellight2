@@ -80,8 +80,7 @@ namespace PixelLight
 		typedef T Type;
 	};
 
-	PL_TODO(AM, "Should use size_t equivalent");
-	template <class T, int N>
+	template <class T, size N>
 	struct RemoveExtent<T[N]>
 	{
 		typedef T Type;
@@ -126,8 +125,7 @@ namespace PixelLight
 	template <class T>
 	struct IsArray<T[]> : StaticTrue {};
 
-	PL_TODO(AM, "Should use size_t equivalent");
-	template <class T, int N>
+	template <class T, size N>
 	struct IsArray<T[N]> : StaticTrue {};
 
 	/**
