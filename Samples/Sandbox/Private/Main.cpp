@@ -15,6 +15,7 @@
 #include <Core/Utils/Tuple.h>
 #include <Core/String/CString.h>
 #include <Core/String/DString.h>
+#include <Core/Containers/Array.h>
 using namespace PixelLight;
 
 #include <functional>
@@ -43,8 +44,24 @@ void Invoke(const F& fn, const Tuple<T...>& tuple, IndexSequence<I...>)
 	fn(TupleGet<I>(tuple)...);
 }
 
+struct Data
+{
+	int a;
+	int b;
+
+	Data() : a(10), b(20) {}
+};
+
 int PLMain()
 {
+	Array<Data> arr(8);
+	//arr.Add(Data());
+	arr.Resize(10);
+
+	PodArray<int> numbers;
+	numbers.Resize(18);
+
+#if 0
 	Function<void(int)> f(func);
 	Function<void(int)> g([&](int i) { counter += i; });
 
@@ -59,6 +76,7 @@ int PLMain()
 	TupleStore<0>(t, 2);
 	TupleStore<1>(t, 4.0f);
 	Invoke(func2, t, MakeIndexSequence<2>());
+#endif
 	
 #if 0
 	ElapsedTime rawCall;
@@ -126,7 +144,7 @@ int PLMain()
 	printf("std::function lambda call: %I64d\n", stdlamCall.GetTime());
 #endif
 
-	CString str("aaa");
+
 
 	int dummy = 0;
 	scanf("%d", &dummy);
