@@ -21,6 +21,9 @@
 #endif
 
 
+// STD headers
+#include <stdio.h>
+
 // Common headers
 #include "CoreMacros.h"
 #include "System/Exception.h"
