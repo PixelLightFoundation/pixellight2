@@ -1,6 +1,6 @@
 #include <Core/File/File.h>
 
-using namespace File;
+using namespace PixelLight;
 
 //
 PL_CORE_API const FileDesc StdIn = stdin;

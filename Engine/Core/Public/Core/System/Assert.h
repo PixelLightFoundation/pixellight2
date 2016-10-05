@@ -14,7 +14,7 @@
  *
  *	@param x The expression to check
  */
-#define require(x) if (!(x)) { PL_DBG_BREAK; PixelLight::Internal::__Assert(#x); }
+#define require(x) if (!(x)) { PL_DBG_BREAK; /*PixelLight::Internal::__Assert(#x);*/ }
 
 /**
  *	Extended require() function with custom message.
@@ -23,7 +23,7 @@
  *	@param x The expression to check
  *	@param m Custom message to show
  */
-#define require_msg(x, m, ...) if (!(x)) { PL_DBG_BREAK; PixelLight::Internal::__Assert(m, __VA_ARGS__); }
+#define require_msg(x, m, ...) if (!(x)) { PL_DBG_BREAK; /*PixelLight::Internal::__Assert(m, __VA_ARGS__);*/ }
 
 /**
  *	Debug utility used to validate result of an operation.

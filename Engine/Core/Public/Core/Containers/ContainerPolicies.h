@@ -62,7 +62,7 @@ namespace PixelLight
 	struct NoSortPolicy
 	{
 		template <class T, typename TSize>
-		static T* SortInLast(T* first, TSize cnt, T* el) { return el; }
+		static T* SortInLast(T* first, TSize cnt, const T& el) { return first + (cnt - 1); }
 
 		template <class T, typename TSize>
 		static void Find(T* first, TSize cnt, const T& search) {}
@@ -72,35 +72,31 @@ namespace PixelLight
 	struct SimpleSortPolicy
 	{
 		template <class T, typename TSize>
-		static T* SortInLast(T* first, TSize cnt, T* el)
+		static T* SortInLast(T* first, TSize cnt, const T& el)
 		{
 			// 'el' is the last element in the array, find its new place
 			TSize lo = 0, hi = cnt - 1;
-			T* e = el;
+			T* e = first + cnt;
 			while (lo <= hi)
 			{
-				TSize mid = lo + ((hi - lo) / 2);
+				TSize mid = (lo + hi) / 2;
 				e = &first[mid];
 				
-				if (*e == *el) // can exit
-				{
-					break;
-				}
-				else if (*el < *e) // go left
-				{
-					hi = mid - 1;
-				}
-				else // go right
+				if (*e < el)
 				{
 					lo = mid + 1;
 				}
+				else if (*e == el)
+				{
+					break;
+				}
+				else
+				{
+					hi = mid - 1;
+				}
 			}
-			
-			if (e != el)
-			{
-				// Placement has changed, shift
-				// ...
-			}
+
+			return e;
 		}
 
 		template <class T, typename TSize>

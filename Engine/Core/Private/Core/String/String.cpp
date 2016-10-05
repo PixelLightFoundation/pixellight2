@@ -14,3 +14,15 @@ size Str::Len(const wchar_t* str)
 {
 	return wcslen(str);
 }
+
+//
+int Str::Cmp(const char* str1, const char* str2)
+{
+	return strcmp(str1, str2);
+}
+
+//
+int Str::Cmp(const wchar_t* str1, const wchar_t* str2)
+{
+	return wcscmp(str1, str2);
+}

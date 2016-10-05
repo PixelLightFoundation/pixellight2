@@ -16,6 +16,7 @@
 #include <Core/String/CString.h>
 #include <Core/String/DString.h>
 #include <Core/Containers/Array.h>
+#include <Core/Containers/HashMap.h>
 using namespace PixelLight;
 
 #include <functional>
@@ -54,12 +55,30 @@ struct Data
 
 int PLMain()
 {
-	Array<Data> arr(8);
-	//arr.Add(Data());
-	arr.Resize(10);
+	//Array<Data> arr(8);
+	////arr.Add(Data());
+	//arr.Resize(10);
 
-	PodArray<int> numbers;
-	numbers.Resize(18);
+	//PodArray<int> numbers;
+	//numbers.Resize(18);
+
+	//SortedArray<int> sortedNumbers;
+	//sortedNumbers.Add(5);
+	//sortedNumbers.Add(4);
+	//sortedNumbers.Add(1);
+	//sortedNumbers.Add(2);
+	//sortedNumbers.Add(3);
+	//sortedNumbers.Add(6);
+
+	HashMap<const char*, int> table;
+	table.Insert("abc", 1);
+	table.Insert("hey", 108);
+	table.Insert("duh", 512);
+
+	const int* r;
+	bool b1 = table.Find("hey", &r);
+	bool b2 = table.Find("miss", &r);
+	b1 = b1;
 
 #if 0
 	Function<void(int)> f(func);

@@ -12,7 +12,7 @@ namespace PixelLight
 	template <class T, class TSortPolicy = NoSortPolicy, class TInitPolicy = DefaultCtorInitPolicy, class TGrowPolicy = FixedGrowPolicy<16>, typename TIndex = uint32>
 	struct Array
 	{
-		Array() : _data(reinterpret_cast<T*>(&_emptyArray)) {}
+		Array() : _data((T*)&_emptyArray) {}
 
 		Array(TIndex initialSize) : Array()
 		{
@@ -29,8 +29,12 @@ namespace PixelLight
 		T& Add(const T& el)
 		{
 			GrowIfRequired(Size() + 1);
-			T* e = new (&Begin()[SizeRef()++]) T(el);
-			e = TSortPolicy::SortInLast(Begin(), Size(), e);
+			T* last = End();
+			SizeRef()++;
+			T* e = TSortPolicy::SortInLast(Begin(), Size(), el);
+			Mem::Move(e + 1, e, (last - e) * sizeof(T));
+			e = new (e) T(el);
+			
 			return *e;
 		}
 
@@ -73,11 +77,11 @@ namespace PixelLight
 		/** Begin iterator */
 		T* Begin()
 		{
-			return _data + sizeof(Header);
+			return (T*)(((char*)_data) + sizeof(Header));
 		}
 		const T* Begin() const
 		{
-			return _data + sizeof(Header);
+			return (T*)(((char*)_data) + sizeof(Header));
 		}
 		
 		/** End iterator */
@@ -139,12 +143,12 @@ namespace PixelLight
 		
 		TIndex& SizeRef()
 		{
-			return *reinterpret_cast<const Header*>(_data)->Size;
+			return reinterpret_cast<Header*>(_data)->Size;
 		}
 		
 		TIndex& CapRef()
 		{
-			return *reinterpret_cast<const Header*>(_data)->Capacity;
+			return reinterpret_cast<Header*>(_data)->Capacity;
 		}
 
 		T* _data = nullptr;
@@ -153,9 +157,12 @@ namespace PixelLight
 		static const Header _emptyArray;
 	};
 
+	template <class T, class TSortPolicy, class TInitPolicy, class TGrowPolicy, typename TIndex>
+	typename const Array<T, TSortPolicy, TInitPolicy, TGrowPolicy, TIndex>::Header Array<T, TSortPolicy, TInitPolicy, TGrowPolicy, TIndex>::_emptyArray;
+
 	/** Sorted array */
 	template <class T>
-	using SortedArray = Array<T>;
+	using SortedArray = Array<T, SimpleSortPolicy>;
 
 	/** Unique sorted array (set) */
 	template <class T>
