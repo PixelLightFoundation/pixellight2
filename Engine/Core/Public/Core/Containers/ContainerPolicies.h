@@ -44,7 +44,17 @@ namespace PixelLight
 		template <typename TSize>
 		static TSize Grow(TSize currentSize)
 		{
-			return currentSize + GROW;
+			return GROW * ((currentSize / GROW) + 1);
+		}
+	};
+	
+	/** Container grow policy: tight grow */
+	struct TightGrowPolicy
+	{
+		template <typename TSize>
+		static TSize Grow(TSize currentSize)
+		{
+			return currentSize;
 		}
 	};
 
@@ -52,7 +62,7 @@ namespace PixelLight
 	struct NoSortPolicy
 	{
 		template <class T, typename TSize>
-		static void SortIn(T* first, TSize cnt) {}
+		static T* SortInLast(T* first, TSize cnt, T* el) { return el; }
 
 		template <class T, typename TSize>
 		static void Find(T* first, TSize cnt, const T& search) {}
@@ -62,7 +72,36 @@ namespace PixelLight
 	struct SimpleSortPolicy
 	{
 		template <class T, typename TSize>
-		static void SortIn(T* first, TSize cnt) {}
+		static T* SortInLast(T* first, TSize cnt, T* el)
+		{
+			// 'el' is the last element in the array, find its new place
+			TSize lo = 0, hi = cnt - 1;
+			T* e = el;
+			while (lo <= hi)
+			{
+				TSize mid = lo + ((hi - lo) / 2);
+				e = &first[mid];
+				
+				if (*e == *el) // can exit
+				{
+					break;
+				}
+				else if (*el < *e) // go left
+				{
+					hi = mid - 1;
+				}
+				else // go right
+				{
+					lo = mid + 1;
+				}
+			}
+			
+			if (e != el)
+			{
+				// Placement has changed, shift
+				// ...
+			}
+		}
 
 		template <class T, typename TSize>
 		static void Find(T* first, TSize cnt, const T& search) {}
